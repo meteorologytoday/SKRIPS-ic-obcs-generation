@@ -1,0 +1,12 @@
+*.nc
+*.bin
+*.swp
+*.tmp
+*.asv
+*.mat
+*.meta
+*.data
+
+src/ww3_gridgen
+src/ww3_bathy
+
