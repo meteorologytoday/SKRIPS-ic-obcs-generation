@@ -1,4 +1,4 @@
-function getHycomData(start_date, end_date, region, opath, OpenDAP_URL, f0)
+function getHycomData(start_date, end_date, region, opath, OpenDAP_URL)
 
         
     zl = [0:1:39];
@@ -39,22 +39,34 @@ function getHycomData(start_date, end_date, region, opath, OpenDAP_URL, f0)
     % yl from -40 to 40, 0.04 degree interval
     % y = 1500 for 0 degree
 
-    hours = {'00','03','06','09','12','15','18','21'};
+    %hours = {'00','03','06','09','12','15','18','21'};
+    hours = {'00'}; % only need 00Z
     date_inc = 1;
 
     format = 'yyyymmdd';
-    time = [datenum(start_date,format):date_inc:datenum(end_date(1:8),format)];
+    time = [datenum(start_date, format):date_inc:datenum(end_date(1:8), format)];
     nt = length(time);
 
     for i = 1:nt
-      for ih = 1:1
+      for ih = 1:length(hours)  
+
+        tl = datestr(time(i), format);
+
+        time_label = datestr(time(i), 'yyyy-mm-dd_hh');
+        if (strcmp(region, 'all') == 1)
+            savename = sprintf('%s/hycom_%s.mat', opath, time_label);
+        else
+            savename = sprintf('%s/hycom_%s_%s.mat', opath, region, time_label);
+        end
+        
 
 
+        if exist(savename) ~= 0
+            fprintf('Target output exists! (%s)\n', savename);
+            continue;
+        end
+        fprintf('Target output: %s\n', savename);
 
-        f1 = f0+i-1
-        tl = datestr(time(i),format);
-
-        frame = f1;
         str_date = tl;
         hour = hours{ih};
         z = zl;
@@ -63,10 +75,6 @@ function getHycomData(start_date, end_date, region, opath, OpenDAP_URL, f0)
 
         D = struct('Date', [], 'Depth', [],'Latitude', [], 'Longitude', [],'ssh',[],'u',[],'v',[],'temperature',[],'salinity',[]);
         
-        t = num2str(frame);
-        p = blanks(4 - length(t));p(:) = '0';
-        frame = [num2str(p) t];
-        disp (frame)
         
         prec='double';
         
@@ -86,8 +94,8 @@ function getHycomData(start_date, end_date, region, opath, OpenDAP_URL, f0)
         Z = zmax+1;
 
         
-        ncid = netcdf.open(OpenDAP_URL,'NOWRITE')
-        [numdims, numvars, numglobalatts, unlimdimID] = netcdf.inq(ncid)
+        ncid = netcdf.open(OpenDAP_URL,'NOWRITE');
+        [numdims, numvars, numglobalatts, unlimdimID] = netcdf.inq(ncid);
         
         for varid =1:numvars
             varlist(varid) = {netcdf.inqVar(ncid,varid-1)};
@@ -96,17 +104,18 @@ function getHycomData(start_date, end_date, region, opath, OpenDAP_URL, f0)
         
         %%  First get the hycom date and time
         param = 'time';
-        ind=find(ismember(varlist,param))
+        ind = find(ismember(varlist,param));
         
-        Temp_Date = netcdf.getVar(ncid,ind-1)
-        str_date_convert = hycom_time(str_date,hour)
-        stime = find(Temp_Date==str_date_convert)
+        Temp_Date = netcdf.getVar(ncid,ind-1);
+        str_date_convert = hycom_time(str_date, hour, 'yyyymmdd'); % The result is an integer.
+        stime = find(Temp_Date==str_date_convert);
         if isempty(stime)
-          continue;
+            disp(['Cannot find date: ' str_date ' ' hour '. Skip this and continue.']);
+            continue;
         end 
 
-        hycom_date = Temp_Date(stime)
-        hycom_date_save = hycom_revert_time(hycom_date)
+        hycom_date = Temp_Date(stime);
+        hycom_date_save = hycom_revert_time(hycom_date);
         D.Date = hycom_date_save;
         
         %% to make array indicies correct for
@@ -127,7 +136,7 @@ function getHycomData(start_date, end_date, region, opath, OpenDAP_URL, f0)
         ind=find(ismember(varlist,param));
         
         hycom_lat = netcdf.getVar(ncid,ind-1,ymin,deltay,prec);
-        hycom_lat
+       
         D.Latitude = hycom_lat;
         D.Latitude = permute(D.Latitude,[2,1]);
         
@@ -136,7 +145,7 @@ function getHycomData(start_date, end_date, region, opath, OpenDAP_URL, f0)
         
         Temp_Lon = netcdf.getVar(ncid,ind-1,xmin,deltax,prec);
         hycom_lon = Temp_Lon;
-        hycom_lon
+        
         if hycom_lon < 0; hycom_lon = hycom_lon + 360; end
         if hycom_lon > 360; hycom_lon = hycom_lon - 360; end
         D.Longitude = hycom_lon;
@@ -154,10 +163,10 @@ function getHycomData(start_date, end_date, region, opath, OpenDAP_URL, f0)
                 tmp(:,:,Z+1) = tmp(:,:,Z);
             end
 
-            tmpScaleName = netcdf.inqAttName(ncid,ind-1,6)
-            tmpScale = netcdf.getAtt(ncid,ind-1,tmpScaleName)
-            tmpOffsetName = netcdf.inqAttName(ncid,ind-1,7)
-            tmpOffset = netcdf.getAtt(ncid,ind-1,tmpOffsetName)
+            tmpScaleName = netcdf.inqAttName(ncid,ind-1,6);
+            tmpScale = netcdf.getAtt(ncid,ind-1,tmpScaleName);
+            tmpOffsetName = netcdf.inqAttName(ncid,ind-1,7);
+            tmpOffset = netcdf.getAtt(ncid,ind-1,tmpOffsetName);
             tmpScale = double(tmpScale);
             tmpOffset = double(tmpOffset);
             tmp = tmp*tmpScale+tmpOffset;
@@ -177,15 +186,6 @@ function getHycomData(start_date, end_date, region, opath, OpenDAP_URL, f0)
         
         %% saving orginal HYCOM  fields into mat file
         varList = 'D';
-        
-        if (strcmp(region, 'all') == 1)
-            savename = [opath '/' frame '_' num2str(hycom_date_save) '.mat'];
-        else
-            savename = [opath '/' frame '_' hour '_' region '.mat'];
-        end
-
-        fprintf('Output: %s', savename)
-
         eval(['save ',savename,' ',varList]);
         netcdf.close(ncid);
 

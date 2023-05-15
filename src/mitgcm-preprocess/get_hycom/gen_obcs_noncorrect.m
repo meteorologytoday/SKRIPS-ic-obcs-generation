@@ -1,3 +1,5 @@
+clearvars -except input_json_file tool_root run_steps;
+
 clear all
 close all
 clc
@@ -8,6 +10,7 @@ hycompath1 = '/project/rus043_data/generate_ar_wave/mitgcm-preprocess/save_hycom
 obcs = 'south';
 hycompath = hycompath1;
 
+% FMT.mat contains two strings: fmt = 'real*4' and Ieee = 'b'
 eval(['load ' fpath 'FMT.mat']);
 eval(['load ' hycompath '0021_00_' obcs '.mat']);
 lon_hycom = D.Longitude

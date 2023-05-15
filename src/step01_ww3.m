@@ -1,4 +1,4 @@
-clearvars -except input_json_file tool_root
+clearvars -except input_json_file tool_root run_steps;
 
 clc;
 close all;
@@ -9,10 +9,11 @@ fprintf('Going to read JSON file: %s\n', input_json_file);
 
 input_json = read_json(input_json_file);
 
-gridgen_nml_file = sprintf('%s/%s', input_json.workspace, input_json.gridgen_nml_file)
+gridgen_nml_file = input_json.gridgen_nml_file;
+gridgen_nml_file_fullpath = sprintf('%s/%s', input_json.workspace, gridgen_nml_file);
 
-nml_grid_init = read_namelist(gridgen_nml_file, 'GRID_INIT');
-nml_outgrid   = read_namelist(gridgen_nml_file, 'OUTGRID');
+nml_grid_init = read_namelist(gridgen_nml_file_fullpath, 'GRID_INIT');
+nml_outgrid   = read_namelist(gridgen_nml_file_fullpath, 'OUTGRID');
 
 bin_dir  = nml_grid_init.bin_dir;
 ref_dir  = nml_grid_init.ref_dir;
@@ -31,21 +32,20 @@ lat_south = nml_outgrid.lat_south;
 lat_north = nml_outgrid.lat_north;
 
 fname = nml_grid_init.fname;
+fnameb = nml_grid_init.fnameb;
 
 edge_lon_west = lon_west - dx / 2; 
 edge_lon_east = lon_east + dx / 2; 
 edge_lat_south = lat_south - dy / 2; 
 edge_lat_north = lat_north + dy / 2; 
 
-
 fprintf('fname        : %s\n', fname);
+fprintf('fnameb       : %s\n', fnameb);
 fprintf('bin_dir      : %s\n', bin_dir);
 fprintf('ref_dir      : %s\n', ref_dir);
 fprintf('data_dir     : %s\n', data_dir);
 fprintf('dlon : %.2f\n', dx);
 fprintf('dlat : %.2f\n', dy);
-
-
 
 fprintf('lon_west  : %.2f\n', lon_west);
 fprintf('lon_east  : %.2f\n', lon_east);
@@ -56,6 +56,13 @@ fprintf('edge_lon_west  : %.2f\n', edge_lon_west);
 fprintf('edge_lon_east  : %.2f\n', edge_lon_east);
 fprintf('edge_lat_south : %.2f\n', edge_lat_south);
 fprintf('edge_lat_north : %.2f\n', edge_lat_north);
+
+% Make softlinks to have global file
+basegrid_dir = sprintf('%s/src/ww3_gridgen/data', tool_root);
+fprintf('Making soft links of basegrid files from %s to data_dir\n', basegrid_dir);
+system(sprintf('ln -s %s/%s.meta %s/', basegrid_dir, input_json.basegrid, data_dir));
+system(sprintf('ln -s %s/%s.mask %s/', basegrid_dir, input_json.basegrid, data_dir));
+
 
 
 lon1d = (lon_west:dx:lon_east);
@@ -119,7 +126,7 @@ end;
 
 % clean up the initial mask
 LIM_VAL = 0.5;
-OFFSET = max([dx dy])
+OFFSET = max([dx dy]);
 m2 = clean_mask(lon,lat,m1,b_split,LIM_VAL,OFFSET);
 
 figure(1);clf;
@@ -156,10 +163,10 @@ write_ww3file([data_dir,'/',fname,'.mask_nobound'],m4);
 d1 = round((sx1)*obstr_scale);
 d2 = round((sy1)*obstr_scale);
 write_ww3obstr([data_dir,'/',fname,'.obst'],d1,d2);
-write_ww3meta([data_dir,'/',fname], gridgen_nml_file,'RECT',lon,lat,1/depth_scale,1/obstr_scale,1.0);
+write_ww3meta([data_dir,'/',fname], gridgen_nml_file, 'RECT', lon,lat,1/depth_scale,1/obstr_scale,1.0);
 
 depth_mitgcm = m4.*d/1000;
 save([ data_dir, '/', 'depth_mitgcm.mat'], "depth_mitgcm");
 
 % create_grid('/home/rus043/test_ww3_grid/gridgen.ZA-7M.nml');
-create_boundary([data_dir,'/',gridgen_nml_file]);
+create_boundary(gridgen_nml_file_fullpath);

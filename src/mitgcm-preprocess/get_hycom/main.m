@@ -1,12 +1,10 @@
-clearvars -except input_json_file tool_root;
+clearvars -except input_json_file tool_root run_steps;
 close all
 clc
 
 input_json = read_json(input_json_file);
 opath = sprintf('%s/%s', input_json.workspace, input_json.hycom.data_dir);
 OpenDAP_URL = 'http://tds.hycom.org/thredds/dodsC/GLBv0.08/expt_93.0';
-
-f0 = 21; % ????????????????????
 
 start_date = input_json.hycom.start_date;
 end_date   = input_json.hycom.end_date;
@@ -23,15 +21,15 @@ regions = {'north', 'east', 'south', 'west'};
 for i = 1:length(regions)
     region = regions{i};
     display(['Grabbing boundary data of region: ' region]);
-    getHycomData(start_date, end_date, region, opath, OpenDAP_URL, f0);
+    getHycomData(start_date, end_date, region, opath, OpenDAP_URL);
 end 
 
 % Initial condition for the first date
-display(['Grabbing initial condition data']);
-getHycomData(start_date, start_date, 'all', opath, OpenDAP_URL, f0);
+disp('Grabbing initial condition data');
+getHycomData(start_date, start_date, 'all', opath, OpenDAP_URL);
 
 
-display(['Download data finished.'])
+disp('Download data finished.');
 
 
 

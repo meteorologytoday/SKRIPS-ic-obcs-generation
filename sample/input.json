@@ -1,11 +1,11 @@
 {
+    "tool_root"          : "/home/t2hsu/projects/SKRIPS-case-generation",
     "workspace"          : "/home/t2hsu/projects/SKRIPS-case-generation/sample",
     "gridgen_nml_file"   : "gridgen.AR-300.nml",
-    
-    
+    "basegrid" : "GLOB-30M",
     "hycom" : {
-        "rawdata_dir"  : "/home/t2hsu/projects/SKRIPS-case-generation/hycom_rawdata",
-        "start_date"   : "20180121", 
-        "end_date"     : "20180128" 
+        "data_dir"    : "hycom_data",
+        "start_date"  : "20180121", 
+        "end_date"    : "20180128" 
     }
 }

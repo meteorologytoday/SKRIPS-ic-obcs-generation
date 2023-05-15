@@ -1,11 +1,11 @@
-clearvars -except input_json_file tool_root;
+clearvars -except input_json_file tool_root run_steps;
 
 input_json = read_json(input_json_file);
-gridgen_nml_file = sprintf('%s/%s', input_json.workspace, input_json.gridgen_nml_file)
+gridgen_nml_file = sprintf('%s/%s', input_json.workspace, input_json.gridgen_nml_file);
 
 nml_grid_init = read_namelist(gridgen_nml_file, 'GRID_INIT');
 
-data_dir = nml_grid_init.data_dir
+data_dir = nml_grid_init.data_dir;
 nml_rect_nml = read_namelist([ data_dir '/' nml_grid_init.fname '.meta' ], 'RECT_NML');
 
 
@@ -76,7 +76,7 @@ end
 
 % plot dz and other parameters
 output_filename = sprintf('%s/grid.mat', data_dir);
-fprintf("Going to output: %s \n", output_filename);
+fprintf('Going to output: %s\n', output_filename);
 fileID = fopen([ data_dir '/delZ.txt' ],'w');
 fprintf(fileID,'%f, \n',dz);
 fclose(fileID);
@@ -84,7 +84,7 @@ save(output_filename);
 
 % plot bathymetry
 depth_mitgcm_filename = sprintf('%s/depth_mitgcm.mat', data_dir);
-fprintf('Going to load: %s \n', depth_mitgcm_filename);
+fprintf('Going to load: %s\n', depth_mitgcm_filename);
 load(depth_mitgcm_filename);
 
 output_filename = sprintf('%s/bathymetry_ar_50v.bin', data_dir);

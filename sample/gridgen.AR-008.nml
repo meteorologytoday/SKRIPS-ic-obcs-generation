@@ -100,8 +100,8 @@ $  IS_GLOBALB : set to 1 if the base grid is global, else 0
   DX         =  0.08
   DY         =  0.08
   LON_WEST   = 180.04
-  LON_EAST   = 239.96
-  LAT_SOUTH  = 18.24
+  LON_EAST   = 243.96
+  LAT_SOUTH  = 18.20
   LAT_NORTH  = 53.96
   IS_GLOBAL  =   0
   IS_GLOBALB =   1

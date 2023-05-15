@@ -26,6 +26,8 @@ nt1 = 8*1;
 obcsN = 'o';
 nsn1 = 0;
 nsn2 = 800;
+
+% Corner islands
 if strcmp(obcsN,'o') == 1
     OB_Jnorth = [zeros(nsn1,1); ones(nsn2,1); zeros(nxc - nsn1 - nsn2,1)]';
 end
@@ -119,7 +121,8 @@ if strcmp(obcsN,'o') == 1
         HY_N_V = rdslice([hycompath 'hycom_water_v_' obcs '.bin'],[nx1 ny1 nz1],it,fmt,Ieee);
         HY_N_T = rdslice([hycompath 'hycom_water_temp_' obcs '.bin'],[nx1 ny1 nz1],it,fmt,Ieee);
         HY_N_S = rdslice([hycompath 'hycom_salinity_' obcs '.bin'],[nx1 ny1 nz1],it,fmt,Ieee);
-        
+       
+        % interpolation 
         [Tm,xc1,yc1,zc1] = exinthycomobcs(fpath,'T',HY_N_T,HY_N_LON,HY_N_LAT,HY_DEPTH,xc1,yc1,xf1,yf1,indx,indy,zc1);
         [Sm,xc1,yc1,zc1] = exinthycomobcs(fpath,'S',HY_N_S,HY_N_LON,HY_N_LAT,HY_DEPTH,xc1,yc1,xf1,yf1,indx,indy,zc1);
         [Um,xc1,yc1,zc1] = exinthycomobcs(fpath,'U',HY_N_U,HY_N_LON,HY_N_LAT,HY_DEPTH,xc1,yc1,xf1,yf1,indx,indy,zc1);
