@@ -3,7 +3,7 @@ close all
 clc
 
 input_json = read_json(input_json_file);
-opath = input_json.hycom.rawdata_dir;
+opath = sprintf('%s/%s', input_json.workspace, input_json.hycom.data_dir);
 OpenDAP_URL = 'http://tds.hycom.org/thredds/dodsC/GLBv0.08/expt_93.0';
 
 f0 = 21; % ????????????????????
