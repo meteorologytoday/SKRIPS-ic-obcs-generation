@@ -5,7 +5,8 @@
     "basegrid" : "GLOB-30M",
     "hycom" : {
         "data_dir"    : "hycom_data",
-        "start_date"  : "20180121", 
-        "end_date"    : "20180128" 
+        "ic_obcs_dir" : "hycom_data_processed",
+        "start_date"  : "2018-01-21", 
+        "end_date"    : "2018-01-28" 
     }
 }
