@@ -34,7 +34,7 @@ $                2 -> from a .poly file
 &GRID_INIT
   BIN_DIR = '/home/t2hsu/projects/SKRIPS-case-generation/src/ww3_gridgen/bin'
   REF_DIR = '/home/t2hsu/projects/SKRIPS-case-generation/src/ww3_gridgen/reference'
-  DATA_DIR = '/home/t2hsu/projects/SKRIPS-case-generation/sample/output'
+  DATA_DIR = '/home/t2hsu/projects/SKRIPS-case-generation/sample/output_tmp'
   FNAME_POLY = 'user_polygons.flag'
   FNAME = 'AR-300'
   FNAMEB = 'GLOB-30M'

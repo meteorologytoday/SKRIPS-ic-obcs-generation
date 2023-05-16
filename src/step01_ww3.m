@@ -57,6 +57,9 @@ fprintf('edge_lon_east  : %.2f\n', edge_lon_east);
 fprintf('edge_lat_south : %.2f\n', edge_lat_south);
 fprintf('edge_lat_north : %.2f\n', edge_lat_north);
 
+
+mkdir(data_dir);
+
 % Make softlinks to have global file
 basegrid_dir = sprintf('%s/src/ww3_gridgen/data', tool_root);
 fprintf('Making soft links of basegrid files from %s to data_dir\n', basegrid_dir);
@@ -163,7 +166,7 @@ write_ww3file([data_dir,'/',fname,'.mask_nobound'],m4);
 d1 = round((sx1)*obstr_scale);
 d2 = round((sy1)*obstr_scale);
 write_ww3obstr([data_dir,'/',fname,'.obst'],d1,d2);
-write_ww3meta([data_dir,'/',fname], gridgen_nml_file, 'RECT', lon,lat,1/depth_scale,1/obstr_scale,1.0);
+write_ww3meta([data_dir,'/',fname], gridgen_nml_file_fullpath, 'RECT', lon,lat,1/depth_scale,1/obstr_scale,1.0);
 
 depth_mitgcm = m4.*d/1000;
 save([ data_dir, '/', 'depth_mitgcm.mat'], "depth_mitgcm");

@@ -1,21 +1,20 @@
-function [] = wrslice(file, arr, k, varargin)
-%% wrslice(filename,arr,n,k) writes an array of shape [nx,ny,...]
-% to a direct access binary file (float or double precisision) named
+function [arr] = rdslice(file,N,k,varargin)
+%% rdslice(filename,[nx ny ...],k) returns an array of shape [nx,ny,...]
+% read from a direct access binary file (float or double precisision) named
 % by the string 'filename'. The file may contain multi-dimensional
-% data. 'n' is the record number to be written where the record length
-% is the size of the array 'arr'.
+% data. Note that cumsum([nx ny ...]*k) <= length of file.
 %
-% eg.   wrslice('t.xyt',T,4);
+% eg.   temp = rdslice('t.xyt', [160 120], 4);
 %
-% rdsclice(filename,A,k,type) writes an array of type 'type'.
+% rdsclice(filename,[nx ny ...],k,type) returns an array of type 'type'.
 % where type can be one of 'real*4' or 'real*8'. The default is 'real*8'.
-%
-% DART $Id$
+
+%% DART $Id$
 
 % Default word-length
 WORDLENGTH=8;
 rtype='real*8';
-ieee='b';
+ieee='l';
 
 % Check optional arguments
 args=char(varargin);
@@ -45,27 +44,26 @@ while (size(args,1) > 0)
  args=args(2:end,:);
 end
 
+nnn=prod(N);
 
-N=size(arr);
-nnn=prod(N); % total number of array's elements
-
-[fid mess]=fopen(file,'r+',ieee);
+[fid mess]=fopen(file,'r',ieee);
 if fid == -1
- [fid mess]=fopen(file,'w',ieee);
- if fid == -1
-  sprintf('Error while opening file:\n%s',mess)
-  return
- end
+ sprintf('Error while opening file:\n%s',mess)
+ arr=0;
+ return
 end
 st=fseek(fid,nnn*(k-1)*WORDLENGTH,'bof');
 if st ~= 0
  mess=ferror(fid);
  sprintf('There was an error while positioning the file pointer:\n%s',mess)
+ arr=0;
  return
 end
-count=fwrite(fid,arr,rtype);
+[arr count]=fread(fid,nnn,rtype);
 if count ~= nnn
  sprintf('Not enough data was available to be read: off EOF?')
+ arr=0;
  return
 end
 st=fclose(fid);
+arr=reshape(arr,N);

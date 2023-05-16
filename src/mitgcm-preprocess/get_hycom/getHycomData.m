@@ -43,8 +43,8 @@ function getHycomData(start_date, end_date, region, opath, OpenDAP_URL)
     hours = {'00'}; % only need 00Z
     date_inc = 1;
 
-    format = 'yyyymmdd';
-    time = [datenum(start_date, format):date_inc:datenum(end_date(1:8), format)];
+    format = 'yyyy-mm-dd';
+    time = [datenum(start_date, format):date_inc:datenum(end_date, format)];
     nt = length(time);
 
     for i = 1:nt
@@ -62,7 +62,7 @@ function getHycomData(start_date, end_date, region, opath, OpenDAP_URL)
 
 
         if exist(savename) ~= 0
-            fprintf('Target output exists! (%s)\n', savename);
+            fprintf('Target output already exists, skip it! (%s)\n', savename);
             continue;
         end
         fprintf('Target output: %s\n', savename);
@@ -107,7 +107,7 @@ function getHycomData(start_date, end_date, region, opath, OpenDAP_URL)
         ind = find(ismember(varlist,param));
         
         Temp_Date = netcdf.getVar(ncid,ind-1);
-        str_date_convert = hycom_time(str_date, hour, 'yyyymmdd'); % The result is an integer.
+        str_date_convert = hycom_time(str_date, hour, 'yyyy-mm-dd'); % The result is an integer.
         stime = find(Temp_Date==str_date_convert);
         if isempty(stime)
             disp(['Cannot find date: ' str_date ' ' hour '. Skip this and continue.']);
@@ -116,6 +116,8 @@ function getHycomData(start_date, end_date, region, opath, OpenDAP_URL)
 
         hycom_date = Temp_Date(stime);
         hycom_date_save = hycom_revert_time(hycom_date);
+       
+ 
         D.Date = hycom_date_save;
         
         %% to make array indicies correct for

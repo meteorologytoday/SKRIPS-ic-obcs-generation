@@ -34,7 +34,7 @@ $                2 -> from a .poly file
 &GRID_INIT
   BIN_DIR = '/home/t2hsu/projects/SKRIPS-case-generation/src/ww3_gridgen/bin'
   REF_DIR = '/home/t2hsu/projects/SKRIPS-case-generation/src/ww3_gridgen/reference'
-  DATA_DIR = '/home/t2hsu/projects/SKRIPS-case-generation/sample/output'
+  DATA_DIR = '/home/t2hsu/projects/SKRIPS-case-generation/sample/output_tmp'
   FNAME_POLY = 'user_polygons.flag'
   FNAME = 'AR-100'
   FNAMEB = 'GLOB-30M'
@@ -99,10 +99,10 @@ $  IS_GLOBALB : set to 1 if the base grid is global, else 0
   TYPE       = 'rect'
   DX         =  1.0
   DY         =  1.0
-  LON_WEST   = 180.5
+  LON_WEST   = 200.5
   LON_EAST   = 239.5
-  LAT_SOUTH  = 18.5
-  LAT_NORTH  = 53.5
+  LAT_SOUTH  = 20.5
+  LAT_NORTH  = 39.5
   IS_GLOBAL  =   0
   IS_GLOBALB =   1
 /

@@ -4,6 +4,6 @@ function [matlab_time_num] = hycom_revert_time(hycom_time)
     %% Notice that the output string contains hours
     
     matlab_time_num = (hycom_time + 38736)/24.0 + 728872;    
-    matlab_time_num = datestr(matlab_time_num,'yyyymmddhh');
+    matlab_time_num = datestr(matlab_time_num,'yyyy-mm-dd_hh');
 
 return;

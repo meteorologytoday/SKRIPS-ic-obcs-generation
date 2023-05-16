@@ -1,11 +1,12 @@
 clearvars -except input_json_file tool_root run_steps;
-
-clear all
 close all
 clc
 
-fpath = '/project/rus043_data/generate_ar_wave/mitgcm-preprocess/save_ic_obcs/';
-hycompath1 = '/project/rus043_data/generate_ar_wave/mitgcm-preprocess/save_hycom/';
+input_json = read_json(input_json_file);
+fpath = input_json.hycom.ic_obcs_dir;
+hycompath1 = input_json.hycom.data_dir;
+
+mkdir(fpath);
 
 obcs = 'south';
 hycompath = hycompath1;

@@ -1,4 +1,4 @@
-function [] = wrslice(file, arr, k, varargin)
+function [] = wrslice(file,arr,k,varargin)
 %% wrslice(filename,arr,n,k) writes an array of shape [nx,ny,...]
 % to a direct access binary file (float or double precisision) named
 % by the string 'filename'. The file may contain multi-dimensional
@@ -15,7 +15,7 @@ function [] = wrslice(file, arr, k, varargin)
 % Default word-length
 WORDLENGTH=8;
 rtype='real*8';
-ieee='b';
+ieee='l';
 
 % Check optional arguments
 args=char(varargin);
@@ -47,7 +47,7 @@ end
 
 
 N=size(arr);
-nnn=prod(N); % total number of array's elements
+nnn=prod(N);
 
 [fid mess]=fopen(file,'r+',ieee);
 if fid == -1

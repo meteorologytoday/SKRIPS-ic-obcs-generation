@@ -1,4 +1,4 @@
-function [status, Tmsk, Pmsk] = check3dmask(varname, datafile, mask_dir, nrec, gd, fmt, Ieee)
+function status = check3dmask(fpath,datafile,nrec,var)
 
     %% check3dmask(datafile)
 
@@ -10,43 +10,32 @@ function [status, Tmsk, Pmsk] = check3dmask(varname, datafile, mask_dir, nrec, g
     %% Modified          by
     %% Maintained by adcroft@mit.edu, abiastoch@ucsd.edu
 
-    %% gd : the datastructure loaded from grid.mat
-
     %% Read model grid and masks.
+    eval(['load ' fpath 'FMT.mat']);
+    eval(['load ' fpath 'grid.mat']);
+    % xc = XC(:,1); yc = YC(1,:); zc = RC;
+    % nxc = length(xc); nyc = length(yc);nzc = length(zc);
 
-    if strcmp(varname,'T') == 1
-        Pmsk = rdmds([mask_dir '/hFacC']);
-    elseif strcmp(varname,'S') == 1
-        Pmsk = rdmds([mask_dir '/hFacC']);
-    elseif strcmp(varname,'U') == 1
-        Pmsk = rdmds([mask_dir '/hFacW']);
-    elseif strcmp(varname,'V') == 1
-        Pmsk = rdmds([mask_dir '/hFacS']);
+    if strcmp(var,'T') == 1
+        Pmsk = rdmds([fpath 'MASK/hFacC']);
+    elseif strcmp(var,'S') == 1
+        Pmsk = rdmds([fpath 'MASK/hFacC']);
+    elseif strcmp(var,'U') == 1
+        Pmsk = rdmds([fpath 'MASK/hFacW']);
+    elseif strcmp(var,'V') == 1
+        Pmsk = rdmds([fpath 'MASK/hFacS']);
     end
     Pmsk(Pmsk~=0) = 1;
-    sum_Pmsk = sum(Pmsk(:));
-
-    nxc = gd.nxc;
-    nyc = gd.nyc;
-    nzc = gd.nzc;
+    sum(Pmsk(:))
 
     %% Read data.
-    T = rdslice(datafile,[nxc nyc nzc],nrec,fmt,Ieee);
+    T = rdslice([fpath datafile],[nxc nyc nzc],nrec,fmt,Ieee);
     Tmsk = ones([nxc nyc nzc]);
     Tmsk(T==0) = 0;
-    
-    sum_Tmsk = sum(Tmsk(:));
+    sum(Tmsk(:))
 
-    % Pmsk is the mask from mitgcm
-    % Tmsk is the inferred mask from `datafile`
-
-
-    %% Find mismatchs.
+    %% Finf mismatchs.
     mismatch = find(Pmsk~=Tmsk);
-    
-    fprintf('Sum of mitgcm mask : %d\n', sum_Pmsk);
-    fprintf('Sum of datafile inferred mask : %d\n', sum_Tmsk);
-
 
     %% Stop if any mismatch.
     if isempty(mismatch)
@@ -55,8 +44,10 @@ function [status, Tmsk, Pmsk] = check3dmask(varname, datafile, mask_dir, nrec, g
         %report('check3dmask(%i th-record of "%s") passed  OK\n',nrec,datafile)
     else
 
+        save('Tmsk.mat','Tmsk');
+        save('Pmsk.mat','Pmsk');
         fprintf('I found %i points where %i th-record of %s mis-matched %s\n',...
-            prod(size(mismatch)),nrec, datafile, [mask_dir '/pmask.bin']);
+            prod(size(mismatch)),nrec,[fpath datafile],[fpath 'pmask.bin']);
 
         %report('I found %i points where %i th-record of %s mis-matched %s\n',...
         %    prod(size(mismatch)),nrec,[fpath datafile],[fpath 'pmask.bin']);
