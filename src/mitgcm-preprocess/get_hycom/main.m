@@ -26,7 +26,7 @@ end
 
 % Initial condition for the first date
 disp('Grabbing initial condition data');
-getHycomData(start_date, start_date, 'all', opath, OpenDAP_URL);
+getHycomData(start_date, end_date, 'all', opath, OpenDAP_URL);
 
 
 disp('Download data finished.');

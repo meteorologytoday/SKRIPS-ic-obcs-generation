@@ -24,11 +24,11 @@ function [Tm,xc,yc,zc] = hycom2modelgrid(varname, data, lon_hycom, lat_hycom, z_
 
     % Slice the msk according to idx_lon and idx_lat
     if idx_lon == 0
-        idx_lon = 1:nxc
+        idx_lon = 1:nxc;
     end
 
     if idx_lat == 0
-        idx_lat = 1:nyc
+        idx_lat = 1:nyc;
     end
 
     msk = msk(idx_lon, idx_lat,:);
@@ -42,7 +42,7 @@ function [Tm,xc,yc,zc] = hycom2modelgrid(varname, data, lon_hycom, lat_hycom, z_
 
     % Fill-in HYCOM missing-data as much as possible horizontally
     % BEFORE interpolating to target grid
-    iterations = 50
+    iterations = 50;
     for k = 1:nzl
         fprintf('Fill the missing data of the %d-th layer.\n', k);
 
@@ -71,7 +71,7 @@ function [Tm,xc,yc,zc] = hycom2modelgrid(varname, data, lon_hycom, lat_hycom, z_
     TLz(isnan(TLz)) = 0;
 
     %% Interpolate horizontaly.
-    Tm = zeros(nxc,nyc,nzc);
+    Tm = zeros(nxc, nyc, nzc);
     for k = 1:nzc
         fprintf('Interpolating horizontally the missing data of the %d-th layer.\n', k);
         if strcmp(varname,'T') == 1 || strcmp(varname,'S') == 1
