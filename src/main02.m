@@ -3,7 +3,6 @@ input_json_file = '/home/t2hsu/projects/SKRIPS-case-generation/sample/input.json
 
 addpath([tool_root '/src']);
 
-
 input_json = read_json(input_json_file);
 
 run_steps = {'step06', 'step07'};

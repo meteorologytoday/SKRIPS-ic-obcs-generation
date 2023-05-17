@@ -6,7 +6,7 @@ addpath([tool_root '/src']);
 
 run_steps = {'step01', 'step02', 'step03', 'step04'};
 
-run_steps = { 'step02', 'step03', 'step04'};
+%run_steps = { 'step02', 'step03', 'step04'};
 
 
 for i = 1:length(run_steps)
@@ -20,7 +20,7 @@ for i = 1:length(run_steps)
 
     elseif strcmp(run_step, 'step02') == 1
         % Use the ww3-generated intermediate files to produce
-        % bathymetry binary file,  and 
+        % bathymetry binary file,  and grid.mat 
         run([ tool_root '/src/mitgcm-preprocess/gen_mesh_no_mask/genMesh.m' ])
 
     elseif strcmp(run_step, 'step03') == 1
@@ -32,7 +32,7 @@ for i = 1:length(run_steps)
         run([ tool_root '/src/mitgcm-preprocess/get_hycom/main2.m'])
         %run([ tool_root '/src/mitgcm-preprocess/get_hycom/gen_obcs_noncorrect.m'])
     else
-        error(sprintf('Unknown step: %s', run_step));
+        error('Unknown step: %s', run_step);
     end
 end
 

@@ -12,24 +12,36 @@ nml_grid_init = read_namelist(gridgen_nml_file, 'GRID_INIT');
 
 grid_dir = nml_grid_init.data_dir;
 
-final_output_dir = sprintf('%s/%s', input_json.workspace, input_json.output_dir);
-fprintf('Making output dir: %s\n', final_output_dir);
-mkdir(final_output_dir);
+interp_data_dir = sprintf('%s/%s', input_json.workspace, input_json.interp_data_dir);
+fprintf('Making output dir: %s\n', interp_data_dir);
+mkdir(interp_data_dir);
 
+ic_dir = sprintf('%s/initial_conditions', interp_data_dir);
+fprintf('Making initial condition dir: %s\n', ic_dir);
+mkdir(ic_dir);
+
+obc_dir = sprintf('%s/open_boundary_conditions', interp_data_dir);
+fprintf('Making open boundary condition dir: %s\n', obc_dir);
+mkdir(obc_dir);
+
+
+
+time = [datenum(start_date, format):1:datenum(end_date, format)];
+nt = length(time);
 
 
 % Make initial condition file
-target_date_ic = sprintf('%s_00', input_json.hycom.start_date);
-fprintf('Making initial condition date: %s\n', target_date_ic);
-%gen_ic_hycom(grid_dir, mask_dir, hycom_data_dir, final_output_dir, target_date_ic);
+for t = 1:length(time)
+    target_date = datestr(time(t), 'yyyy-mm-dd_hh');
+    fprintf('Making initial condition date: %s\n', target_date);
+    gen_ic_hycom(grid_dir, mask_dir, hycom_data_dir, ic_dir, target_date);
+end
 
 
 % Make boundary condition files
-time = [datenum(start_date, format):1:datenum(end_date, format)];
-nt = length(time);
-bnds = {'north', 'south', 'east', 'west'};
+bnds = {'east', 'west', 'north', 'south'};
 thickness = 1;
-corner_island_flag=0;
+corner_island_flag = 0;
 
 fprintf('Making boundary conditions... \n');
 fprintf('thickness = %d\n', thickness);
@@ -41,13 +53,7 @@ for t = 1:length(time)
         bnd = bnds{i};
 
         fprintf('Making boundary condition bnd=%s, date=%s\n', bnd, target_date);
-        gen_obcs_hycom(bnd, thickness, corner_island_flag, grid_dir, mask_dir, hycom_data_dir, final_output_dir, t, target_date);
+        gen_obcs_hycom(bnd, thickness, corner_island_flag, grid_dir, mask_dir, ic_dir, obc_dir, target_date);
 
     end
 end
-
-
-    
-
-
-

@@ -136,9 +136,15 @@ figure(1);clf;
 pcolor(lon,lat,m2);shading flat;caxis([0 3]);colorbar
 
 % remove artificially generated lakes
-LAKE_TOL = 10000;
+% LAKE_TOL is a count of grids that is labeled water
+% The function `remove_lake` will first group connected
+% water pixels with labels. Then, it removes the water
+% body that is too small, measured by LAKE_TOL. Please
+% read the `remove_lake.m` file for detailed usage.
+%LAKE_TOL = 10000;
+LAKE_TOL = 100;
 IS_GLOBAL = 0;
-[m4,mask_map] = remove_lake(m2,LAKE_TOL,IS_GLOBAL);
+[m4, mask_map] = remove_lake(m2,LAKE_TOL,IS_GLOBAL);
 
 figure(1);clf;
 pcolor(lon,lat,m4);shading flat;caxis([0 3]);colorbar
@@ -167,6 +173,9 @@ d1 = round((sx1)*obstr_scale);
 d2 = round((sy1)*obstr_scale);
 write_ww3obstr([data_dir,'/',fname,'.obst'],d1,d2);
 write_ww3meta([data_dir,'/',fname], gridgen_nml_file_fullpath, 'RECT', lon,lat,1/depth_scale,1/obstr_scale,1.0);
+
+depth_mitgcm = d/1000;
+save([ data_dir, '/', 'depth_mitgcm_before_masked.mat'], "depth_mitgcm");
 
 depth_mitgcm = m4.*d/1000;
 save([ data_dir, '/', 'depth_mitgcm.mat'], "depth_mitgcm");

@@ -9,7 +9,9 @@ function [Tm,xc,yc,zc] = hycom2modelgrid(varname, data, lon_hycom, lat_hycom, z_
     nxc = length(xc);
     nyc = length(yc);
     nzc = length(zc);
-   
+  
+    fprintf('(nxc, nyc, nzc) = (%d, %d, %d)\n', nxc, nyc, nzc);
+ 
     if strcmp(varname,'T') == 1
         msk = rdmds([mask_dir '/hFacC']);
     elseif strcmp(varname,'S') == 1

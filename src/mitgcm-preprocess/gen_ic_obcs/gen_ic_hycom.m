@@ -40,6 +40,13 @@ function gen_ic_hycom(grid_dir, mask_dir, hycom_data_dir, output_dir, target_dat
         var = vars{i};
 
         fprintf('Processing variable: %s\n', varname);
+        
+        output_bin_file = sprintf('%s/hycom_%s_%s.bin', output_dir, varname, target_date);
+        if exist(output_bin_file) ~= 0
+            fprintf('Target file %s already exists. Skip.\n', output_bin_file);
+            continue;
+        end
+
 
         [interpolated_var, xc,yc,zc] = hycom2modelgrid(varname, var, hycom_lon, hycom_lat, hycom_z, gd.xc, gd.yc, gd.xf, gd.yf, gd.zc, mask_dir, 0, 0);
 
