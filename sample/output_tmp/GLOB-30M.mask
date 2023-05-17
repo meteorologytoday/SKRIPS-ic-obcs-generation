@@ -1,1 +1,0 @@
-/home/t2hsu/projects/SKRIPS-case-generation/src/ww3_gridgen/data/GLOB-30M.mask

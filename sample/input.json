@@ -7,7 +7,7 @@
         "data_dir"    : "hycom_data",
         "ic_obcs_dir" : "hycom_data_processed",
         "start_date"  : "2018-01-21", 
-        "end_date"    : "2018-01-28" 
+        "end_date"    : "2018-01-22" 
     },
     "output_dir" : "output_final"
 }
