@@ -1,9 +1,5 @@
-tool_root = '/home/t2hsu/projects/SKRIPS-case-generation';
-input_json_file = '/home/t2hsu/projects/SKRIPS-case-generation/sample/input.json';
 
-addpath([tool_root '/src']);
-
-input_json = read_json(input_json_file);
+run('init.m');
 
 run_steps = {'step06', 'step07'};
 for i = 1:length(run_steps)

@@ -1,12 +1,6 @@
 clear; clc;
 
-tool_root = '/home/t2hsu/projects/SKRIPS-case-generation';
-input_json_file = '/home/t2hsu/projects/SKRIPS-case-generation/sample/input.json';
-
-addpath([tool_root '/src']);
-addpath([tool_root '/src/mitgcm-preprocess/gen_ic_obcs']);
-
-input_json = read_json(input_json_file);
+run('init.m');
 
 gridgen_nml_file = input_json.gridgen_nml_file;
 nml_grid_init = read_namelist(sprintf('%s/%s', input_json.workspace, gridgen_nml_file), 'GRID_INIT');
