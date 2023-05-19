@@ -4,7 +4,8 @@ function getHycomData(start_date, end_date, region, opath, OpenDAP_URL)
     zl = [0:1:39];
     if ( strcmp(region, 'all') == 1 ) 
         xl = [2244:1:3056];
-        yl = [1720:1:2356];
+        %yl = [1720:1:2356];
+        yl = [1720:1:2506];
 
     elseif (strcmp(region, 'north') == 1)
         xl = [2244:1:3056];
@@ -94,7 +95,7 @@ function getHycomData(start_date, end_date, region, opath, OpenDAP_URL)
         Z = zmax+1;
 
         
-        ncid = netcdf.open(OpenDAP_URL,'NOWRITE');
+        ncid = netcdf.open(OpenDAP_URL, 'NOWRITE');
         [numdims, numvars, numglobalatts, unlimdimID] = netcdf.inq(ncid);
         
         for varid =1:numvars

@@ -4,11 +4,13 @@ mitgcm_rundir=$1
 output_dir=$2
 
 if [ "$mitgcm_rundir" = "" ] ; then
-    echo "Error: Missing the first argument"
+    echo "Error: Missing the first argument (input: mitgcm directory)"
+    exit 1;
 fi
 
 if [ "$output_dir" = "" ] ; then
-    echo "Error: Missing the second argument"
+    echo "Error: Missing the second argument (output: mask directory)"
+    exit 1;
 fi
 
 

@@ -58,6 +58,7 @@ fprintf('edge_lat_south : %.2f\n', edge_lat_south);
 fprintf('edge_lat_north : %.2f\n', edge_lat_north);
 
 
+
 mkdir(data_dir);
 
 % Make softlinks to have global file
@@ -66,11 +67,12 @@ fprintf('Making soft links of basegrid files from %s to data_dir\n', basegrid_di
 system(sprintf('ln -s %s/%s.meta %s/', basegrid_dir, input_json.basegrid, data_dir));
 system(sprintf('ln -s %s/%s.mask %s/', basegrid_dir, input_json.basegrid, data_dir));
 
-
-
 lon1d = (lon_west:dx:lon_east);
 lat1d = (lat_south:dy:lat_north);
 [lon,lat] = meshgrid(lon1d,lat1d);
+
+fprintf('Number of grids in (lon, lat) = (%d, %d)\n', length(lon1d), length(lat1d) );
+
 
 addpath(bin_dir,'-END');
 load([ref_dir,'/coastal_bound_inter.mat']);
@@ -142,7 +144,7 @@ pcolor(lon,lat,m2);shading flat;caxis([0 3]);colorbar
 % body that is too small, measured by LAKE_TOL. Please
 % read the `remove_lake.m` file for detailed usage.
 %LAKE_TOL = 10000;
-LAKE_TOL = 100;
+LAKE_TOL = 10000;
 IS_GLOBAL = 0;
 [m4, mask_map] = remove_lake(m2,LAKE_TOL,IS_GLOBAL);
 

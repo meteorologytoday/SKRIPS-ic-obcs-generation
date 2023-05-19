@@ -34,7 +34,10 @@ nt = length(time);
 for t = 1:length(time)
     target_date = datestr(time(t), 'yyyy-mm-dd_hh');
     fprintf('Making initial condition date: %s\n', target_date);
-    gen_ic_hycom(grid_dir, mask_dir, hycom_data_dir, ic_dir, target_date);
+    status = gen_ic_hycom(grid_dir, mask_dir, hycom_data_dir, ic_dir, target_date);
+    if status ~= 0
+        fprintf('Error: cannot make initial condition of date %s, please check.\n', target_date);
+    end
 end
 
 
