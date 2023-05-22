@@ -90,6 +90,12 @@ function gen_obcs_hycom(bnd, thickness, corner_island_flag, grid_dir, mask_dir, 
     
         data_file = sprintf('%s/hycom_%s_%s.bin', interpolated_hycom_data_dir, varname, target_date);
         fprintf('Loading file: %s\n', data_file);
+
+        if exist(data_file) ~= 2
+            fprintf('Cannot find file. Skip it.\n');
+            continue;
+        end
+
         interpolated_var = rdslice(data_file, [nxc nyc nzc], 1, fmt, Ieee);
 
         interpolated_var = interpolated_var(idx_lon, idx_lat, :);
