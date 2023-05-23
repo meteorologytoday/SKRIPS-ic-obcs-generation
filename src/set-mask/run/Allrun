@@ -1,0 +1,8 @@
+#!/bin/csh -f
+
+ln -sf ../input/* .
+ln -sf ../../gen_mesh_no_mask/bathy*.bin .
+
+cp ../build/mitgcmuv .
+
+# ./mitgcmuv

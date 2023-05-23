@@ -39,6 +39,15 @@ edge_lon_east = lon_east + dx / 2;
 edge_lat_south = lat_south - dy / 2; 
 edge_lat_north = lat_north + dy / 2; 
 
+
+if isfield(input_json, 'lake_grids_threshold')
+    LAKE_TOL = input_json.lake_grids_threshold;
+else
+    LAKE_TOL = 10000;
+end
+
+
+
 fprintf('fname        : %s\n', fname);
 fprintf('fnameb       : %s\n', fnameb);
 fprintf('bin_dir      : %s\n', bin_dir);
@@ -56,6 +65,8 @@ fprintf('edge_lon_west  : %.2f\n', edge_lon_west);
 fprintf('edge_lon_east  : %.2f\n', edge_lon_east);
 fprintf('edge_lat_south : %.2f\n', edge_lat_south);
 fprintf('edge_lat_north : %.2f\n', edge_lat_north);
+
+fprintf('Lakd grids threshold: %d\n', LAKE_TOL);
 
 
 

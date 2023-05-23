@@ -6,6 +6,7 @@
 *.mat
 *.meta
 *.data
+*.tar
 
 src/ww3_gridgen
 src/ww3_bathy
