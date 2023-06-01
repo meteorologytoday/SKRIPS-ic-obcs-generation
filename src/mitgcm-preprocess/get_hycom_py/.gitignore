@@ -1,3 +1,4 @@
 *.npz
+*.pickle
 hycom_info.json
 hycom_info.npz

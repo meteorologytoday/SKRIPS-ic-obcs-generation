@@ -17,16 +17,3 @@ fprintf('start_date : %s\n', start_date);
 fprintf('end_date   : %s\n', end_date);
 
 
-%all_obcs = {'north', 'south', 'west', 'east'};
-
-%mkdir(output_dir);
-%for i = 1:length(all_obcs)
-    
-%    obcs = all_obcs{i};
-%    fprintf('Doing boundary: %s\n', obcs);
-
-%    gen_obcs_bin(obcs, input_dir, output_dir, start_date, end_date, FMT_json.fmt, FMT_json.Ieee);
-
-%end
-
-
