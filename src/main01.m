@@ -1,7 +1,7 @@
  
 run('init.m');
 
-run_steps = {'step01', 'step02', 'step03', 'step04'};
+%run_steps = {'step01', 'step02', 'step03', 'step04'};
 
 run_steps = { 'step02', 'step03', 'step04'};
 
