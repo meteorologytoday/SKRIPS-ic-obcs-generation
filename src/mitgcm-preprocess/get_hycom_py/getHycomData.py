@@ -66,7 +66,7 @@ def lookupSubsetByDate(dataset_info, dt):
 
 
     
-def work(dt, output_filename):
+def work(dt, fmt_and_output_filename):
     
     status = 0
 
@@ -97,6 +97,15 @@ def work(dt, output_filename):
 
         lon1, lon2, lat1, lat2 = hycom_share.findRegion_latlon(lat, args.lat_rng, rotated_lon, args.lon_rng)
 
+        lon1 = 2244
+        lon2 = 3056
+
+        lat1 = 1720
+        lat2 = 2506
+
+        #xl = [2244:1:3056];
+        #yl = [1720:1:2506];
+ 
         print("Found range: (%d, %d) x (%d, %d)" % (lon1, lon2, lat1, lat2))
 
         # construct the mapping between lon and nonrotated lon
@@ -162,18 +171,14 @@ def work(dt, output_filename):
                     coords = coords,
                 ).rename(varname))
 
-
-
             new_ds = xr.merge(new_ds)
-
-            for output_format in args.output_formats:
+            for output_fmt, output_filename in fmt_and_output_filename.items():
             
-                if output_format == 'netcdf':
-                    tmp_output_filename = "%s.nc" % (output_filename,)
-                    print("Output filename: ", tmp_output_filename)
-                    new_ds.to_netcdf(tmp_output_filename)
+                if output_fmt == 'netcdf':
+                    print("Output filename: ", output_filename)
+                    new_ds.to_netcdf(output_filename)
 
-                elif output_format == 'mat':
+                elif output_fmt == 'mat':
 
                     # This section is to produce output compatible for matlab version
                     # that keep generating the boundary and initial condition files.
@@ -181,16 +186,46 @@ def work(dt, output_filename):
                     D = {
                         'Longitude' : new_ds.coords['lon'].to_numpy(),
                         'Latitude'  : new_ds.coords['lat'].to_numpy(),
-                        'Depth'     : - new_ds.coords['depth'].to_numpy(),
-                        'Date'      : [hycom_time[time_idx[0],],
+                        'Date'      : [ hycom_time[time_idx[0]], ],
                     }
-    
-                    for varname in saved_varnames:
-                        D[varname] = [ ]
+                        
 
-                    tmp_output_filename = "%s.mat" % (output_filename, )
-                    print("Output filename: ", tmp_output_filename)
-                    savemat(tmp_output_filename, mdict)
+                    if 'depth' in new_ds.coords:
+                        z = - new_ds.coords['depth'].to_numpy()
+                        z = np.concatenate((z, [-6500.0]))
+                        D['Depth'] = z
+
+                    for k in ['Longitude', 'Latitude']:
+                        D[k] = D[k][np.newaxis, :]
+ 
+                    for k in ['Depth']:
+                        D[k] = D[k][:, np.newaxis]
+                        
+                    for varname in saved_varnames:
+
+                        tmp = new_ds[varname].to_numpy()
+                        tmp[np.isnan(tmp)] = 0.0
+
+                        if varname in ['water_u', 'water_v', 'water_temp', 'salinity']:
+
+                            tmp = np.concatenate(
+                                (tmp, tmp[:, -1:, :, :]),
+                                axis=1
+                            )
+
+                            D[varname] = np.transpose(
+                                tmp,
+                                axes=(0, 3, 2, 1),
+                            )[0, :, :, :]
+
+                        elif varname in ['surf_el']:
+                            D[varname] = np.transpose(
+                                tmp,
+                                axes=(0, 2, 1)
+                            )[0, :, :]
+
+                    print("Output filename: ", output_filename)
+                    savemat(output_filename, {'D' : D})
                
 
 
@@ -213,18 +248,29 @@ failed_dates = []
 with Pool(processes=args.nproc) as pool:
 
     dts = list(pd.date_range(beg_date, end_date, inclusive="both"))
-    output_filenames = [
-        "%s/hycom_%s.nc" % (args.output_dir, dt.strftime("%Y-%m-%d_%H")) for dt in dts
-    ]
+
 
     params = []
+    for i, dt in enumerate(dts):
+     
+        dt_str = dt.strftime("%Y-%m-%d_%H")
+        fmt_and_output_filename = {}
+ 
+        for fmt in args.output_formats:
 
-    for i in range(len(dts)):
-        if os.path.isfile(output_filenames[i]):
-            print("Skip the output file %s because it already exists." % (output_filenames[i],))
+            ext = {'netcdf':'nc', 'mat': 'mat'}[fmt]
+            fmt_and_output_filename[fmt] = "%s/hycom_%s.%s" % (args.output_dir, dt_str, ext)
+
+
+        all_exists = True
+        for fmt, output_filename in fmt_and_output_filename.items():
+            all_exists = all_exists and os.path.isfile(output_filename)
+
+        if all_exists:
+            print("Skip the date %s because files all exist." % (dt_str,))
             continue
 
-        params.append((dts[i], output_filenames[i]))
+        params.append((dts[i], fmt_and_output_filename))
         
 
 
