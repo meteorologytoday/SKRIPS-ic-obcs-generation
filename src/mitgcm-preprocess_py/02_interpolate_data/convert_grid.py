@@ -1,4 +1,5 @@
 import numpy as np
+import scipy.interpolate
 from scipy.interpolate import RegularGridInterpolator
 import functools
 import MITgcmutils
@@ -43,7 +44,7 @@ def horizontallyExpand(data, mask, iter_max=50):
 
 
         if k == iter_max:
-            print("Iteration maximum reached before the data is filled.")
+            #print("Iteration maximum reached before the data is filled.")
             break
 
 
@@ -102,32 +103,52 @@ def convertGrid(data, grid_type, XC1, YC1, ZC1, grid2_dir=".", fill_value=0.0):
         Y2 = 'YG'
         Z2 = 'RC'
 
-    grid2_mask = MITgcmutils.rdmds('%s/%s' % (grid2_dir, grid2_name))
+    grid2_lnd = MITgcmutils.rdmds('%s/%s' % (grid2_dir, grid2_name)) == 0
+    grid2_ocn = MITgcmutils.rdmds('%s/%s' % (grid2_dir, grid2_name)) != 0
+
+    print("Number of ocn grid: ", np.sum(grid2_ocn))
+    print("Number of lnd grid: ", np.sum(grid2_lnd))
+
     X2 = MITgcmutils.rdmds('%s/%s' % (grid2_dir, X2))[0, :]
     Y2 = MITgcmutils.rdmds('%s/%s' % (grid2_dir, Y2))[:, 0]
     Z2 = MITgcmutils.rdmds('%s/%s' % (grid2_dir, Z2)).flatten()
 
 
+
+
     # We do not have hycom 3D mask.
     # We only hope to expand as much as possible
     # to project onto mitgcm's grid fully    
-    iter_max = 50
+    iter_max = 5
     grid1_mask = np.ones(data.shape)
     data_xyfilled = np.zeros_like(data)
-    for k in range(ZC1):
-        print("Filling out layer %d" % (k,))
+    for k in range(len(ZC1)):
+        print("Filling out layer %d\r" % (k,))
         _data, iterations = horizontallyExpand(data[k, :, :], grid1_mask[k, :, :], iter_max=iter_max)
         data_xyfilled[k, :, :] = _data
 
     # Now interpolate
-    interpolator = RegularGridInterpolator((ZC1, YC1, XC1), data_xyfilled, fill_value=np.nan)
+    data2 = np.zeros((len(Z2), len(YC1), len(XC1)))
+    print("Vertical interpolation")
+    for j in range(len(YC1)):
+        for i in range(len(XC1)):
+            f = scipy.interpolate.interp1d(ZC1, data_xyfilled[:, j, i])
+            data2[:, j, i] = f(Z2)
 
-    grid_pts = np.meshgrid(Z2, Y2, X2, indexing='ij', sparse=True)
-    interpolated_data = interpolator(*grid_pts)
+    data2[np.isnan(data2)] = 0
+    
+    print("Horizontal interpolation")
+    data3 = np.zeros((len(Z2), len(Y2), len(X2)))
+    #grid_pts = np.meshgrid(Y2, X2)#, indexing='ij')#, sparse=True)
+    for k in range(len(Z2)):
+        #interpolator = RegularGridInterpolator((YC1, XC1), data2[k, :, :], fill_value=np.nan)
+        interpolator = scipy.interpolate.RectBivariateSpline(YC1, XC1, data2[k, :, :], kx=1, ky=1)
+        data3[k, :, :] = interpolator(Y2, X2)
 
-    interpolated_data[grid2_mask == 0] = 0
 
-    missing_idx = np.isnan(interpolated_data)
+    data3[grid2_lnd] = np.nan
+
+    missing_idx = np.isnan(data3) & grid2_ocn
     missing_cnt = np.sum(missing_idx)
     
     if missing_cnt == 0:
@@ -136,9 +157,9 @@ def convertGrid(data, grid_type, XC1, YC1, ZC1, grid2_dir=".", fill_value=0.0):
         print("Still missing %d pts." % (missing_cnt,))    
         print("Going to replace missing pts by `fill_value` = %f." % (fill_value,))
 
-        interpolated_data[missing_idx] = fill_value
+        data3[missing_idx] = fill_value
 
-    return interpolated_data, dict(Z=Z2, Y=Y2, X=X2)
+    return data3, dict(Z=Z2, Y=Y2, X=X2)
 
 if __name__ == "__main__":
 
