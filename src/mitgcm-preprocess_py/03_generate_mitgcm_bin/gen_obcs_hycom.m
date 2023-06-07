@@ -1,3 +1,10 @@
+
+
+def sliceBoundaryOut(data, bnd, thickness, grid_type):
+
+    
+
+
 function gen_obcs_hycom(bnd, thickness, corner_island_flag, grid_dir, mask_dir, interpolated_hycom_data_dir, output_dir, target_date)
 %% `bnd`            : Side of the boundary. Accepting 'north', 'south', 'west', 'east'.
 %% `corner_island_flag` : If adding corner island or not. 0 = do not add. 1 = add
