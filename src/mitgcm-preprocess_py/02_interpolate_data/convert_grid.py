@@ -79,31 +79,33 @@ def horizontallyExpand(data, mask, iter_max=50):
 
 
 
-def convertGrid(data, grid_type, XC1, YC1, ZC1, XC2, YC2, ZC2, XF2, YF2, grid2_dir=".", fill_value=0.0):
+def convertGrid(data, grid_type, XC1, YC1, ZC1, grid2_dir=".", fill_value=0.0):
     
     if data.shape != (len(ZC1), len(YC1), len(XC1)):
         raise Exception("Input data shape does not match input XC1 YC1 ZC1.")
 
     if grid_type == "T":
         grid2_name = 'hFacC'
-        X2 = XC2
-        Y2 = YC2
-        Z2 = ZC2
+        X2 = 'XC'
+        Y2 = 'YC'
+        Z2 = 'RC'
 
     elif grid_type == "U":
         grid2_name = 'hFacW'
-        X2 = XF2
-        Y2 = YC2
-        Z2 = ZC2
-
+        X2 = 'XG'
+        Y2 = 'YC'
+        Z2 = 'RC'
 
     elif grid_type == "V":
         grid2_name = 'hFacS'
-        X2 = XC2
-        Y2 = YF2
-        Z2 = ZC2
+        X2 = 'XC'
+        Y2 = 'YG'
+        Z2 = 'RC'
 
     grid2_mask = MITgcmutils.rdmds('%s/%s' % (grid2_dir, grid2_name))
+    X2 = MITgcmutils.rdmds('%s/%s' % (grid2_dir, X2))[0, :]
+    Y2 = MITgcmutils.rdmds('%s/%s' % (grid2_dir, Y2))[:, 0]
+    Z2 = MITgcmutils.rdmds('%s/%s' % (grid2_dir, Z2)).flatten()
 
 
     # We do not have hycom 3D mask.
@@ -129,14 +131,14 @@ def convertGrid(data, grid_type, XC1, YC1, ZC1, XC2, YC2, ZC2, XF2, YF2, grid2_d
     missing_cnt = np.sum(missing_idx)
     
     if missing_cnt == 0:
-        print("Data is successfully intepolated.")
+        print("Data is successfully interpolated.")
     else:
         print("Still missing %d pts." % (missing_cnt,))    
         print("Going to replace missing pts by `fill_value` = %f." % (fill_value,))
 
         interpolated_data[missing_idx] = fill_value
 
-    return interpolated_data
+    return interpolated_data, dict(Z=Z2, Y=Y2, X=X2)
 
 if __name__ == "__main__":
 
