@@ -1,4 +1,4 @@
-input_json_file = '';  %;'/home/t2hsu/projects/AR_airsea_coupling/case01/01_produce_case/input.json';
+input_json_file = '/cw3e/mead/projects/csg102/t2hsu/AR_projects/project01/produce_ic_obcs_008/input.json'
 
 input_json = read_json(input_json_file);
 

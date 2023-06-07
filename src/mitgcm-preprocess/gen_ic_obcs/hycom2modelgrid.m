@@ -33,6 +33,7 @@ function [Tm,xc,yc,zc] = hycom2modelgrid(varname, data, lon_hycom, lat_hycom, z_
         idx_lat = 1:nyc;
     end
 
+    %disp(size(msk))
     msk = msk(idx_lon, idx_lat,:);
   
     % Compute the filled HYCOM data first (TL)

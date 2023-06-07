@@ -21,9 +21,9 @@ hycom_dataset_list = {
         "expt_93.0",
         "expt_92.9",
         "expt_57.7",
-#        "expt_92.8",
-#        "expt_57.2",
-#        "expt_56.3",
+        "expt_92.8",
+        "expt_57.2",
+        "expt_56.3",
 #        "expt_53.X",
     ],
 

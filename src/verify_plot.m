@@ -6,7 +6,8 @@ addpath('./mitgcm-preprocess/gen_ic_obcs');
 varname = 'S';
 cbrng = [33, 35];
 cmap = 'redblue';
-input_dir = '/home/t2hsu/projects/SKRIPS-case-generation/sample/output_final';
+input_dir = '/cw3e/mead/projects/csg102/t2hsu/AR_projects/project01/case01/caseInput/mitGCM_bin';
+%/home/t2hsu/projects/SKRIPS-case-generation/sample/output_final';
 
 date_str='2018-01-21_00';
 

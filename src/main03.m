@@ -15,6 +15,13 @@ ic_dir = sprintf('%s/initial_conditions', interp_data_dir);
 obc_dir = sprintf('%s/open_boundary_conditions', interp_data_dir);
 
 final_output_data_dir = sprintf('%s/%s', input_json.workspace, input_json.output_dir);
+
+
+fprintf('Start date: %s\n', start_date);
+fprintf('End   date: %s\n', end_date);
+
+
+
 fprintf('Making output dir: %s\n', final_output_data_dir);
 mkdir(final_output_data_dir);
 

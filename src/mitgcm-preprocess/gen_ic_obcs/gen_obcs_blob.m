@@ -5,6 +5,8 @@ function gen_obcs_blob(bnd, input_dir, output_dir, start_date, end_date)
 %% `start_date`   : should be a formatted string `yyyy-mm-dd_hh`
 %% `end_date`     : should be a formatted string `yyyy-mm-dd_hh`
 
+    format = 'yyyy-mm-dd';
+
     time = [datenum(start_date, format):1:datenum(end_date, format)];
     nt = length(time);
     varnames = {'T', 'S', 'U', 'V'};

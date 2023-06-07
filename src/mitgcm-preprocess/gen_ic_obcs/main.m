@@ -24,8 +24,7 @@ obc_dir = sprintf('%s/open_boundary_conditions', interp_data_dir);
 fprintf('Making open boundary condition dir: %s\n', obc_dir);
 mkdir(obc_dir);
 
-
-
+format = 'yyyy-mm-dd';
 time = [datenum(start_date, format):1:datenum(end_date, format)];
 nt = length(time);
 
