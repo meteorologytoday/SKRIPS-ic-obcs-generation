@@ -18,7 +18,7 @@ ds_hycom = xr.open_dataset(args.input)
 ZC1 = - ds_hycom.coords["depth"].to_numpy()
 YC1 =   ds_hycom.coords["lat"].to_numpy()
 XC1 =   ds_hycom.coords["lon"].to_numpy()
-interpolated_data, grid2 = convert_grid.convertGrid(args.input, args.grid_type, XC1, YC1, ZC1, grid2_dir=args.grid_dir, fill_value=0.0)
+interpolated_data, grid2 = convert_grid.convertGrid(ds_hycom[args.varname][0, :, :, :].to_numpy(), args.grid_type, XC1, YC1, ZC1, grid2_dir=args.grid_dir, fill_value=0.0)
 
 ds_output =xr.DataArray(
     data = np.expand_dims(interpolated_data, 0)
