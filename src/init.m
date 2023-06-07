@@ -6,5 +6,6 @@ tool_root = input_json.tool_root;
 
 addpath([tool_root '/src']);
 addpath([tool_root '/src/mitgcm-preprocess/gen_ic_obcs']);
+addpath('/cw3e/mead/projects/csg102/t2hsu/scripps_kaust_model/MITgcm_c67m/utils/matlab/');
 
 

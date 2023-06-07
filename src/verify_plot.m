@@ -4,11 +4,12 @@ close all;
 addpath('./mitgcm-preprocess/gen_ic_obcs');
 
 varname = 'S';
-cbrng = [33, 35];
+cbrng = [31, 35];
 cmap = 'redblue';
-input_dir = '/cw3e/mead/projects/csg102/t2hsu/AR_projects/project01/case01/caseInput/mitGCM_bin';
+input_dir = '/cw3e/mead/projects/csg102/t2hsu/AR_projects/project01/produce_ic_obcs_008/output_final_008_2017-02-01';
+%/cw3e/mead/projects/csg102/t2hsu/AR_projects/project01/case01/caseInput/mitGCM_bin';
 %/home/t2hsu/projects/SKRIPS-case-generation/sample/output_final';
-input_dir = '/home/t2hsu/verify';
+%input_dir = '/home/t2hsu/verify';
 
 date_str='2017-02-01_00';
 obcs_skips = 0

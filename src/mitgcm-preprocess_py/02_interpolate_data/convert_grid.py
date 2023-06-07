@@ -80,7 +80,7 @@ def horizontallyExpand(data, mask, iter_max=50):
 
 
 
-def convertGrid(data, grid_type, XC1, YC1, ZC1, grid2_dir=".", fill_value=0.0):
+def convertGrid(data, grid_type, XC1, YC1, ZC1, grid2_dir=".", fill_value=0.0, iter_max=50, check_rng=[-np.inf, np.inf]):
     
     if data.shape != (len(ZC1), len(YC1), len(XC1)):
         raise Exception("Input data shape does not match input XC1 YC1 ZC1.")
@@ -119,14 +119,15 @@ def convertGrid(data, grid_type, XC1, YC1, ZC1, grid2_dir=".", fill_value=0.0):
     # We do not have hycom 3D mask.
     # We only hope to expand as much as possible
     # to project onto mitgcm's grid fully    
-    iter_max = 5
     grid1_mask = np.ones(data.shape)
     data_xyfilled = np.zeros_like(data)
     for k in range(len(ZC1)):
-        print("Filling out layer %d\r" % (k,))
+        print("Filling out layer %d of %d layers...\r" % (k+1, len(ZC1)), end='')
         _data, iterations = horizontallyExpand(data[k, :, :], grid1_mask[k, :, :], iter_max=iter_max)
         data_xyfilled[k, :, :] = _data
 
+    print()
+    print("Filling complete.")
     # Now interpolate
     data2 = np.zeros((len(Z2), len(YC1), len(XC1)))
     print("Vertical interpolation")
@@ -147,10 +148,20 @@ def convertGrid(data, grid_type, XC1, YC1, ZC1, grid2_dir=".", fill_value=0.0):
 
 
     data3[grid2_lnd] = np.nan
+    
+    check_rng_idx = ( (data3 < check_rng[0]) | (data3 > check_rng[1]) ) & np.isfinite(data3) & grid2_ocn
+    check_rng_cnt = np.sum(check_rng_idx)
+
+    if check_rng_cnt == 0:
+        print("All data with a finite value are within check_rng = [%f, %f]." % (*check_rng,))
+    else:
+        print("Warning: %d data with a finite value are not within check_rng = [%f, %f]." % (check_rng_cnt, *check_rng,))
+
+ 
 
     missing_idx = np.isnan(data3) & grid2_ocn
     missing_cnt = np.sum(missing_idx)
-    
+   
     if missing_cnt == 0:
         print("Data is successfully interpolated.")
     else:
