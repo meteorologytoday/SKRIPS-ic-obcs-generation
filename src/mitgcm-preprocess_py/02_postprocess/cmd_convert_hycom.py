@@ -4,10 +4,9 @@ import numpy as np
 import argparse
 import convert_grid
 
-parser = argparse.ArgumentParser(description='Process some integers.')
+parser = argparse.ArgumentParser(description='This program interpolate')
 parser.add_argument('--input', type=str, required=True, help='Input hycom data file')
 parser.add_argument('--output', type=str, required=True, help='Output filename.')
-parser.add_argument('--output2', type=str, required=True, help='Output filename.')
 parser.add_argument('--varname', type=str, required=True, help='Output filename.')
 parser.add_argument('--grid-type', type=str, required=True, help='Output filename.')
 parser.add_argument('--grid-dir', type=str, required=True, help='MITgcm grid folder.')
@@ -40,6 +39,7 @@ da_output.to_netcdf(args.output)
 
 
 
+"""
 
 print("See if i can output an okay binary file")
 
@@ -57,5 +57,5 @@ with open(args.output2, "wb") as f:
 
 
 
-
+"""
 
