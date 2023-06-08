@@ -176,7 +176,10 @@ def work(dt, fmt_and_output_filename):
             
                 if output_fmt == 'netcdf':
                     print("Output filename: ", output_filename)
-                    new_ds.to_netcdf(output_filename)
+                    new_ds.to_netcdf(
+                        output_filename,
+                        unlimited_dims = ["time",],
+                    )
 
                 elif output_fmt == 'mat':
 
