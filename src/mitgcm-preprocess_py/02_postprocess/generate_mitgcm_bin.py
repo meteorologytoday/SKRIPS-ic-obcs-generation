@@ -1,6 +1,8 @@
 import numpy as np
 import xarray as xr
 from pathlib import Path
+import pandas as pd
+import argparse
 
 
 def writeBinary(filename, data, dtype='>f4'):
@@ -40,7 +42,7 @@ def genMITgcmInitCondAndOpenBnd(input_filenames, output_filenames, varname, outp
     ds_open_bnd  = xr.open_mfdataset(input_filenames['open_bnd'], concat_dim="time", combine="nested")
 
     # check if they share the same spatial size
-    for coordname in ["lat", "lon", "depth"]:
+    for coordname in ["lat", "lon", "z"]:
 
         coord_init_cond = ds_init_cond.coords[coordname].to_numpy()
         coord_open_bnd  = ds_open_bnd.coords[coordname].to_numpy()
@@ -91,42 +93,49 @@ def genMITgcmInitCondAndOpenBnd(input_filenames, output_filenames, varname, outp
         
             filename = "%s_%s.nc" % (output_filenames['open_bnd'], k,)
             print("Output file: ", filename)
-            ds_open_bnd[k].to_netcdf(filename)
+            ds_open_bnd[k].to_netcdf(filename, unlimited_dims="time")
 
 
 
 if __name__ == "__main__":
 
-    import pandas as pd
+  
+    parser = argparse.ArgumentParser(
+                    prog = 'generate_mitgcm_bin.py',
+                    description = 'Generate initial binary file and open boundary conditions for mitgcm.',
+    )
 
-    archive_dir = "/cw3e/mead/projects/csg102/t2hsu/AR_projects/project01/produce_ic_obcs_008/hycom_data"
-    
-    output_dir = "output"
+    parser.add_argument('--beg-date', type=str, required=True)
+    parser.add_argument('--end-date', type=str, required=True)
+    parser.add_argument('--input-dir', type=str, required=True)
+    parser.add_argument('--output-dir', type=str, required=True)
+    parser.add_argument('--varnames', type=str, nargs='+', default=['water_u', 'water_v', 'water_temp', 'salinity'], choices=['water_u', 'water_v', 'water_temp', 'salinity',])
 
+    args = parser.parse_args()
+    print(args)
+
+ 
     dt_fmt = "%Y-%m-%d_%H"
-    dts = pd.date_range("2017-02-01", "2017-02-02", freq="D", inclusive="both")
+    dts = pd.date_range(args.beg_date, args.end_date, freq="D", inclusive="both")
     
-    for output_varname, input_varname in dict(
-        T = "water_temp", 
-        S ="salinity",
-    ).items():
-
+    for varname in args.varnames:
+        
         input_filenames = dict(
-            init_cond = "%s/hycom_%s.nc" % (archive_dir, dts[0].strftime(dt_fmt)),
-            open_bnd = [ "%s/hycom_%s.nc" % (archive_dir, dt.strftime(dt_fmt)) for dt in dts ]
+            init_cond = "%s/hycom_%s_%s.nc" % (args.input_dir, dts[0].strftime(dt_fmt), varname),
+            open_bnd = [ "%s/hycom_%s_%s.nc" % (args.input_dir, dt.strftime(dt_fmt), varname) for dt in dts ]
         )
 
         output_filenames = dict(
-            init_cond = "%s/init_cond_%s_%s" % (output_dir, output_varname, dts[0].strftime(dt_fmt)),
-            open_bnd = "%s/open_bnd_%s_%s_%s" % (output_dir, output_varname, dts[0].strftime(dt_fmt), dts[-1].strftime(dt_fmt)),
+            init_cond = "%s/init_cond_%s_%s" % (args.output_dir, varname, dts[0].strftime(dt_fmt)),
+            open_bnd = "%s/open_bnd_%s_%s_%s" % (args.output_dir, varname, dts[0].strftime(dt_fmt), dts[-1].strftime(dt_fmt)),
         )
 
 
         genMITgcmInitCondAndOpenBnd(
             input_filenames,
             output_filenames,
-            input_varname,
-            output_dir,
+            varname,
+            args.output_dir,
             output_fmt="netcdf,binary"
         )
 

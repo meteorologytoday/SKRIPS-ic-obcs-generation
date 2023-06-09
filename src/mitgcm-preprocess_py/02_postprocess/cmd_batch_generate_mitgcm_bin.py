@@ -17,24 +17,14 @@ parser.add_argument('--beg-date', type=str, required=True)
 parser.add_argument('--end-date', type=str, required=True)
 parser.add_argument('--input-dir', type=str, required=True)
 parser.add_argument('--output-dir', type=str, default="output")
-parser.add_argument('--grid-dir', type=str, required=True,)
 parser.add_argument('--varnames', type=str, nargs='+', default=['water_u', 'water_v', 'water_temp', 'salinity'], choices=['water_u', 'water_v', 'water_temp', 'salinity',])
 parser.add_argument('--nproc', type=int, default=1)
-parser.add_argument('--iter-max', type=int, default=50)
 
 args = parser.parse_args()
 print(args)
 
 beg_date = args.beg_date
 end_date = args.end_date
-
-# varname, grid_type, check_rng
-varname_mapping = (
-    ("water_u",    "U", [-10.0, 10.0]),
-    ("water_v",    "V", [-10.0, 10.0]),
-    ("water_temp", "T", [-10.0, 50.0]),
-    ("salinity",   "T", [  10.0, 50.0]),
-)
 
 
 def work(dt, input_filename, output_filename, varname, grid_type,  check_rng):

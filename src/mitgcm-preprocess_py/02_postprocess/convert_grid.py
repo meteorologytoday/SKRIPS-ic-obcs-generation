@@ -103,6 +103,8 @@ def convertGrid(data, grid_type, XC1, YC1, ZC1, grid2_dir=".", fill_value=0.0, i
         Y2 = 'YG'
         Z2 = 'RC'
 
+
+    
     grid2_lnd = MITgcmutils.rdmds('%s/%s' % (grid2_dir, grid2_name)) == 0
     grid2_ocn = MITgcmutils.rdmds('%s/%s' % (grid2_dir, grid2_name)) != 0
 
@@ -112,6 +114,7 @@ def convertGrid(data, grid_type, XC1, YC1, ZC1, grid2_dir=".", fill_value=0.0, i
     X2 = MITgcmutils.rdmds('%s/%s' % (grid2_dir, X2))[0, :]
     Y2 = MITgcmutils.rdmds('%s/%s' % (grid2_dir, Y2))[:, 0]
     Z2 = MITgcmutils.rdmds('%s/%s' % (grid2_dir, Z2)).flatten()
+
 
 
 
@@ -130,6 +133,8 @@ def convertGrid(data, grid_type, XC1, YC1, ZC1, grid2_dir=".", fill_value=0.0, i
     print("Filling complete.")
     # Now interpolate
     data2 = np.zeros((len(Z2), len(YC1), len(XC1)))
+    
+
     print("Vertical interpolation")
     for j in range(len(YC1)):
         for i in range(len(XC1)):
@@ -146,6 +151,8 @@ def convertGrid(data, grid_type, XC1, YC1, ZC1, grid2_dir=".", fill_value=0.0, i
         interpolator = scipy.interpolate.RectBivariateSpline(YC1, XC1, data2[k, :, :], kx=1, ky=1)
         data3[k, :, :] = interpolator(Y2, X2)
 
+    print("!!!!!!!!!!!!!!!!!!!!!! data2", data2.shape)
+    print("!!!!!!!!!!!!!!!!!!!!!! data3", data3.shape)
 
     data3[grid2_lnd] = np.nan
     
