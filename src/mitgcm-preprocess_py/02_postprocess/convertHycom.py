@@ -4,7 +4,7 @@ import pandas as pd
 import argparse
 import convert_grid
 
-def convertHycomGridToMitgcm(input, output, varname, grid_type, grid_dir, iter_max, check_rng):
+def convertHycomGridToMitgcm(input, output, varname, updated_varname, grid_type, grid_dir, iter_max, check_rng, extend_downward):
 
     ds_hycom = xr.open_dataset(input)
 
@@ -12,9 +12,9 @@ def convertHycomGridToMitgcm(input, output, varname, grid_type, grid_dir, iter_m
     YC1 =   ds_hycom.coords["lat"].to_numpy()
     XC1 =   ds_hycom.coords["lon"].to_numpy()
 
-    interpolated_data, grid2 = convert_grid.convertGrid(ds_hycom[varname][0, :, :, :].to_numpy(), grid_type, XC1, YC1, ZC1, grid2_dir=grid_dir, fill_value=-999, iter_max=iter_max, check_rng = check_rng)
+    interpolated_data, grid2 = convert_grid.convertGrid(ds_hycom[varname][0, :, :, :].to_numpy(), grid_type, XC1, YC1, ZC1, grid2_dir=grid_dir, fill_value=-999, iter_max=iter_max, check_rng = check_rng, extend_downward = extend_downward)
 
-    da_output =xr.DataArray(
+    da_output = xr.DataArray(
         data = np.expand_dims(interpolated_data, 0),
         dims = ["time", "z", "lat", "lon"],
         coords = dict(
@@ -24,7 +24,7 @@ def convertHycomGridToMitgcm(input, output, varname, grid_type, grid_dir, iter_m
             time=ds_hycom.coords["time"],
             reference_time=pd.Timestamp('2000-01-01'),
         ),
-    ).rename(varname) 
+    ).rename(updated_varname) 
 
     print("Output file: ", output)
     da_output.to_netcdf(output, unlimited_dims="time")
@@ -45,5 +45,14 @@ if __name__ == "__main__":
 
     print(args)
 
-    convertHycomGridToMitgcm(args.input, args.output, args.varname, args.grid_type, args.grid_dir, args.iter_max, args.check_rng)
+
+
+    updated_varname = {
+        'water_u'    : 'U',
+        'water_v'    : 'V',
+        'water_temp' : 'T',
+        'salinity'   : 'S',
+    }[args.varname]
+
+    convertHycomGridToMitgcm(args.input, args.output, args.varname, updated_varname, args.grid_type, args.grid_dir, args.iter_max, args.check_rng)
 

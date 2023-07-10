@@ -21,6 +21,7 @@ parser.add_argument('--grid-dir', type=str, required=True,)
 parser.add_argument('--varnames', type=str, nargs='+', default=['water_u', 'water_v', 'water_temp', 'salinity'], choices=['water_u', 'water_v', 'water_temp', 'salinity',])
 parser.add_argument('--nproc', type=int, default=1)
 parser.add_argument('--iter-max', type=int, default=50)
+parser.add_argument('--extend-downward', action="store_true")
 
 args = parser.parse_args()
 print(args)
@@ -28,16 +29,16 @@ print(args)
 beg_date = args.beg_date
 end_date = args.end_date
 
-# varname, grid_type, check_rng
+# varname, updated_varname, grid_type, check_rng
 varname_mapping = (
-    ("water_u",    "U", [-10.0, 10.0]),
-    ("water_v",    "V", [-10.0, 10.0]),
-    ("water_temp", "T", [-10.0, 50.0]),
-    ("salinity",   "T", [  10.0, 50.0]),
+    ("water_u",    "U", "U", [-10.0, 10.0]),
+    ("water_v",    "V", "V", [-10.0, 10.0]),
+    ("water_temp", "T", "T", [-10.0, 50.0]),
+    ("salinity",   "S", "T", [  10.0, 50.0]),
 )
 
 
-def work(dt, input_filename, output_filename, varname, grid_type,  check_rng):
+def work(dt, input_filename, output_filename, varname, updated_varname, grid_type,  check_rng):
     
     status = 0
 
@@ -46,9 +47,11 @@ def work(dt, input_filename, output_filename, varname, grid_type,  check_rng):
         
         dt_str = dt.strftime("%Y-%m-%d")
 
-        print("Processing (date, varname) = (%s, %s)" % (dt_str, varname,))
+        print("Processing (date, varname) = (%s, %s => %s)" % (dt_str, varname, updated_varname))
+        
 
-        convertHycom.convertHycomGridToMitgcm(input_filename, output_filename, varname, grid_type, args.grid_dir, args.iter_max, check_rng)
+
+        convertHycom.convertHycomGridToMitgcm(input_filename, output_filename, varname, updated_varname, grid_type, args.grid_dir, args.iter_max, check_rng, extend_downward=args.extend_downward)
     
 
     except Exception as e:
@@ -80,19 +83,19 @@ with Pool(processes=args.nproc) as pool:
      
         dt_str = dt.strftime("%Y-%m-%d_%H")
         
-        for varname, grid_type, check_rng in varname_mapping:
+        for varname, updated_varname, grid_type, check_rng in varname_mapping:
 
             if not ( varname in args.varnames ):
                 continue
 
             input_filename = "%s/hycom_%s.nc" % (args.input_dir, dt_str,)
-            output_filename = "%s/hycom_%s_%s.nc" % (args.output_dir, dt_str, varname)
+            output_filename = "%s/data_%s_%s.nc" % (args.output_dir, dt_str, updated_varname)
 
             if os.path.isfile(output_filename):
                 print("Skip the (date, varname) = (%s, %s) because it exists." % (dt_str, varname))
                 continue
 
-            params.append((dts[i], input_filename, output_filename, varname, grid_type, check_rng))
+            params.append((dts[i], input_filename, output_filename, varname, updated_varname, grid_type, check_rng))
 
     for result in pool.starmap(work, params):
 

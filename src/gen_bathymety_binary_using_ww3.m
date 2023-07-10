@@ -1,4 +1,8 @@
-clearvars -except input_json_file tool_root run_steps;
+
+run('init.m')
+
+
+clearvars -except input_json_file tool_root;
 
 clc;
 close all;
@@ -22,9 +26,6 @@ data_dir  = nml_grid_init.data_dir;
 dx = nml_outgrid.dx;
 dy = nml_outgrid.dy;
 
-
-
-
 lon_west  = nml_outgrid.lon_west;
 lon_east  = nml_outgrid.lon_east;
 
@@ -39,7 +40,9 @@ edge_lon_east = lon_east + dx / 2;
 edge_lat_south = lat_south - dy / 2; 
 edge_lat_north = lat_north + dy / 2; 
 
-
+% LAKE_TOL is the threshold count of the connected water surface grids.
+% If the count of the connected grids is lower than LAKE_TOL, it will be
+% categorized as lake rather than the ocean.
 if isfield(input_json, 'lake_grids_threshold')
     LAKE_TOL = input_json.lake_grids_threshold;
 else
@@ -66,8 +69,7 @@ fprintf('edge_lon_east  : %.2f\n', edge_lon_east);
 fprintf('edge_lat_south : %.2f\n', edge_lat_south);
 fprintf('edge_lat_north : %.2f\n', edge_lat_north);
 
-fprintf('Lakd grids threshold: %d\n', LAKE_TOL);
-
+fprintf('Lake grids threshold: %d\n', LAKE_TOL);
 
 
 mkdir(data_dir);
@@ -193,5 +195,11 @@ save([ data_dir, '/', 'depth_mitgcm_before_masked.mat'], "depth_mitgcm");
 depth_mitgcm = m4.*d/1000;
 save([ data_dir, '/', 'depth_mitgcm.mat'], "depth_mitgcm");
 
+output_filename = sprintf('%s/bathymetry.bin', data_dir);
+fprintf('Going to output: %s\n', output_filename);
+fileID = fopen(output_filename,'w','b');
+fwrite(fileID, depth_mitgcm', 'real*4');
+fclose(fileID);
+
 % create_grid('/home/rus043/test_ww3_grid/gridgen.ZA-7M.nml');
-create_boundary(gridgen_nml_file_fullpath);
+%create_boundary(gridgen_nml_file_fullpath);

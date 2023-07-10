@@ -19,6 +19,35 @@ def _getNeighbors(data):
     data_r = np.roll(data, -1, axis=1) 
 
     return data_t, data_b, data_l, data_r
+
+
+def extendData(data, axis):
+
+    dims = len(data.shape)
+    axis_N = data.shape[axis]
+    swapped_data = np.swapaxes(data, axis, dims-1)
+    swapped_shape = np.array(swapped_data.shape)
+    reordered_data = np.reshape(swapped_data, (-1, axis_N) )
+
+    for i in range(reordered_data.shape[0]):
+        if np.isnan(reordered_data[i, 0]):
+            continue
+
+        for k in range(1, axis_N):
+        
+            # If find the bottom then extend it    
+            if np.isnan(reordered_data[i, k]):
+                reordered_data[i, k:axis_N] = reordered_data[i, k-1]
+                break
+
+     
+    final_data = np.swapaxes( np.reshape(reordered_data, swapped_shape), axis, dims-1)
+
+    return final_data
+
+
+
+
  
 def horizontallyExpand(data, mask, iter_max=50):
 
@@ -80,7 +109,7 @@ def horizontallyExpand(data, mask, iter_max=50):
 
 
 
-def convertGrid(data, grid_type, XC1, YC1, ZC1, grid2_dir=".", fill_value=0.0, iter_max=50, check_rng=[-np.inf, np.inf]):
+def convertGrid(data, grid_type, XC1, YC1, ZC1, grid2_dir=".", fill_value=0.0, iter_max=50, check_rng=[-np.inf, np.inf], extend_downward=False):
     
     if data.shape != (len(ZC1), len(YC1), len(XC1)):
         raise Exception("Input data shape does not match input XC1 YC1 ZC1.")
@@ -131,6 +160,15 @@ def convertGrid(data, grid_type, XC1, YC1, ZC1, grid2_dir=".", fill_value=0.0, i
 
     print()
     print("Filling complete.")
+
+    # Sometimes the hycom data is not deep enough so
+    # the bottom grid will get undesired interpolated
+    # values.
+    if extend_downward:
+        print("Option `extend_downward` is True.")
+        data_xyfilled = extendData(data_xyfilled, axis=0) 
+
+
     # Now interpolate
     data2 = np.zeros((len(Z2), len(YC1), len(XC1)))
     
@@ -141,18 +179,14 @@ def convertGrid(data, grid_type, XC1, YC1, ZC1, grid2_dir=".", fill_value=0.0, i
             f = scipy.interpolate.interp1d(ZC1, data_xyfilled[:, j, i])
             data2[:, j, i] = f(Z2)
 
-    data2[np.isnan(data2)] = 0
+    data2[np.isnan(data2)] = -9999
     
     print("Horizontal interpolation")
     data3 = np.zeros((len(Z2), len(Y2), len(X2)))
-    #grid_pts = np.meshgrid(Y2, X2)#, indexing='ij')#, sparse=True)
     for k in range(len(Z2)):
-        #interpolator = RegularGridInterpolator((YC1, XC1), data2[k, :, :], fill_value=np.nan)
         interpolator = scipy.interpolate.RectBivariateSpline(YC1, XC1, data2[k, :, :], kx=1, ky=1)
         data3[k, :, :] = interpolator(Y2, X2)
 
-    print("!!!!!!!!!!!!!!!!!!!!!! data2", data2.shape)
-    print("!!!!!!!!!!!!!!!!!!!!!! data3", data3.shape)
 
     data3[grid2_lnd] = np.nan
     
