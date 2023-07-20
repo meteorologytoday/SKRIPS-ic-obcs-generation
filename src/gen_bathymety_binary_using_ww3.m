@@ -99,7 +99,7 @@ end;
 
 CUT_OFF = 0.0; % Cut-off depth to distinguish between dry & wet cells
 LIM_BATHY = 0.4; % Base bathymetry cells needing to be wet for the target cell to be considered wet.
-DRY_VAL = 999999; % Depth value set for fry cells
+DRY_VAL = 999999; % Depth value set for dry cells
 
 ref_grid = 'gebco360'; % Name of the file without the '.nc' extension
 xvar = 'lon'; % Name of the variable defining longitudes in file
@@ -112,6 +112,8 @@ d=depth;d(d==DRY_VAL)=nan; pcolor(lon,lat,d); shading flat; colorbar
 
 m1 = ones(size(depth));
 m1(depth == DRY_VAL) = 0;
+
+
 
 figure(1);clf;
 pcolor(lon,lat,m1);shading flat;caxis([0 3]);colorbar
@@ -146,6 +148,9 @@ end;
 LIM_VAL = 0.5;
 OFFSET = max([dx dy]);
 m2 = clean_mask(lon,lat,m1,b_split,LIM_VAL,OFFSET);
+
+fprintf('Sum of m1 = %d, sum of m2 = %d\n', sum(sum(m1)), sum(sum(m2)))
+
 
 figure(1);clf;
 pcolor(lon,lat,m2);shading flat;caxis([0 3]);colorbar

@@ -211,6 +211,16 @@ def convertGrid(data, grid_type, XC1, YC1, ZC1, grid2_dir=".", fill_value=0.0, i
 
         data3[missing_idx] = fill_value
 
+
+    print("Now counting if any data is equal to exactly zero...")
+    zero_idx = (data3 == 0.0) & grid2_ocn
+    zero_cnt = np.sum(zero_idx)
+    if zero_cnt == 0:
+        print("No zero is found on ocean grid.")
+    else:
+        print("Warning: Found %d pts that equals to exactly zero on ocean grid." % (zero_cnt,))    
+
+
     return data3, dict(Z=Z2, Y=Y2, X=X2)
 
 if __name__ == "__main__":
