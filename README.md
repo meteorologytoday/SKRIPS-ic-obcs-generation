@@ -1,2 +1,2 @@
-# SKRIPS-case-generation
+# Introduction
 This project is to help create initial conditions and open boundary conditions for SKRIPS model.
