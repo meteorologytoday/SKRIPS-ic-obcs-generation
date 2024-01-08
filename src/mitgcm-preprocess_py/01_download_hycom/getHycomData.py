@@ -23,7 +23,7 @@ parser.add_argument('--beg-date', type=str, required=True)
 parser.add_argument('--end-date', type=str, required=True)
 parser.add_argument('--lat-rng', type=float, nargs=2, default=[-90, 90])
 parser.add_argument('--lon-rng', type=float, nargs=2, default=[0, 360])
-parser.add_argument('--output-dir', type=str, default="output")
+parser.add_argument('--output-dir', type=str, default="downloaded_hycom_data")
 parser.add_argument('--output-formats', type=str, nargs='+', default=["netcdf"], choices=["netcdf", "mat"])
 parser.add_argument('--varnames', type=str, nargs='+', default=['water_u', 'water_v', 'water_temp', 'salinity', 'surf_el'], choices=['water_u', 'water_v', 'water_temp', 'salinity', 'surf_el'])
 parser.add_argument('--nproc', type=int, default=1)
@@ -97,15 +97,12 @@ def work(dt, fmt_and_output_filename):
 
         lon1, lon2, lat1, lat2 = hycom_share.findRegion_latlon(lat, args.lat_rng, rotated_lon, args.lon_rng)
 
-        lon1 = 2244
-        lon2 = 3056
+        #lon1 = 2244
+        #lon2 = 3056
 
-        lat1 = 1720
-        lat2 = 2506
+        #lat1 = 1720
+        #lat2 = 2506
 
-        #xl = [2244:1:3056];
-        #yl = [1720:1:2506];
- 
         print("Found range: (%d, %d) x (%d, %d)" % (lon1, lon2, lat1, lat2))
 
         # construct the mapping between lon and nonrotated lon

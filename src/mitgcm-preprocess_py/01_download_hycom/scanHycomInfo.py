@@ -16,6 +16,10 @@ class NumpyEncoder(json.JSONEncoder):
             return json.JSONEncoder.default(self, obj)
 
 hycom_dataset_list = {
+    
+    "GLBy0.08" : [
+        "expt_93.0",
+    ],
 
     "GLBv0.08" : [
         "expt_93.0",

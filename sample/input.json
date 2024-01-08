@@ -3,12 +3,5 @@
     "workspace"          : "/home/t2hsu/projects/SKRIPS-case-generation/sample",
     "gridgen_nml_file"   : "gridgen.AR-100.nml",
     "basegrid" : "GLOB-30M",
-    "hycom" : {
-        "data_dir"    : "hycom_data",
-        "ic_obcs_dir" : "hycom_data_processed",
-        "start_date"  : "2018-01-21", 
-        "end_date"    : "2018-01-22" 
-    },
-    "interp_data_dir" : "interp_data",
-    "output_dir" : "output_final"
+    "output_dir" : "output",
 }
